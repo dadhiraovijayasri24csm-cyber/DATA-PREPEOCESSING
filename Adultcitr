@@ -1,0 +1,271 @@
+# ==========================================
+# C I T R  PREPROCESSING
+# Clean -> Integrate -> Transform -> Reduce
+# ==========================================
+
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.feature_selection import VarianceThreshold
+
+# ------------------------------------------
+# Load Dataset
+# ------------------------------------------
+
+df = pd.read_csv("adult.csv")     # Change path if necessary
+
+print("="*50)
+print("ORIGINAL DATASET")
+print("="*50)
+print(df.head())
+
+# ==========================================
+# C - CLEAN
+# ==========================================
+
+print("\n========== CLEAN STEP ==========")
+
+# Check dataset information
+print("\nDataset Info:")
+print(df.info())
+
+# Check missing values
+print("\nMissing Values Before Cleaning:")
+print(df.isnull().sum())
+
+# Adult dataset uses '?' as missing values
+df.replace('?', np.nan, inplace=True)
+
+# Remove duplicate rows
+df = df.drop_duplicates()
+
+# Separate numerical and categorical columns
+num_cols = df.select_dtypes(include=['int64', 'float64']).columns
+cat_cols = df.select_dtypes(include=['object']).columns
+
+# Fill missing numerical values with median
+for col in num_cols:
+    df[col] = df[col].fillna(df[col].median())
+
+# Fill missing categorical values with mode
+for col in cat_cols:
+    df[col] = df[col].fillna(df[col].mode()[0])
+
+print("\nMissing Values After Cleaning:")
+print(df.isnull().sum())
+
+print("\nDataset After Cleaning:")
+print(df.head())
+
+# ==========================================
+# I - INTEGRATE
+# ==========================================
+
+print("\n========== INTEGRATE STEP ==========")
+
+print("Only one dataset is available.")
+print("No integration is required.")
+
+# ==========================================
+# T - TRANSFORM
+# ==========================================
+
+print("\n========== TRANSFORM STEP ==========")
+
+# Encode categorical columns
+encoder = LabelEncoder()
+
+for col in cat_cols:
+    df[col] = encoder.fit_transform(df[col])
+
+# Standardize numerical columns
+scaler = StandardScaler()
+
+df[num_cols] = scaler.fit_transform(df[num_cols])
+
+print("\nDataset After Transformation:")
+print(df.head())
+
+# ==========================================
+# R - REDUCE
+# ==========================================
+
+print("\n========== REDUCE STEP ==========")
+
+selector = VarianceThreshold(threshold=0.01)
+
+reduced_data = selector.fit_transform(df)
+
+print("Original Shape :", df.shape)
+print("Reduced Shape  :", reduced_data.shape)
+
+print("\nReduced Dataset Preview:")
+print(pd.DataFrame(reduced_data).head())
+
+# ==========================================
+# COMPLETED
+# ==========================================
+
+print("\n===================================")
+print("CITR PREPROCESSING COMPLETED")
+print("===================================")
+
+output:==================================================
+ORIGINAL DATASET
+==================================================
+   age  workclass  fnlwgt     education  educational-num      marital-status  \
+0   25    Private  226802          11th                7       Never-married   
+1   38    Private   89814       HS-grad                9  Married-civ-spouse   
+2   28  Local-gov  336951    Assoc-acdm               12  Married-civ-spouse   
+3   44    Private  160323  Some-college               10  Married-civ-spouse   
+4   18          ?  103497  Some-college               10       Never-married   
+
+          occupation relationship   race  gender  capital-gain  capital-loss  \
+0  Machine-op-inspct    Own-child  Black    Male             0             0   
+1    Farming-fishing      Husband  White    Male             0             0   
+2    Protective-serv      Husband  White    Male             0             0   
+3  Machine-op-inspct      Husband  Black    Male          7688             0   
+4                  ?    Own-child  White  Female             0             0   
+
+   hours-per-week native-country income  
+0              40  United-States  <=50K  
+1              50  United-States  <=50K  
+2              40  United-States   >50K  
+3              40  United-States   >50K  
+4              30  United-States  <=50K  
+
+========== CLEAN STEP ==========
+
+Dataset Info:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 48842 entries, 0 to 48841
+Data columns (total 15 columns):
+ #   Column           Non-Null Count  Dtype 
+---  ------           --------------  ----- 
+ 0   age              48842 non-null  int64 
+ 1   workclass        48842 non-null  object
+ 2   fnlwgt           48842 non-null  int64 
+ 3   education        48842 non-null  object
+ 4   educational-num  48842 non-null  int64 
+ 5   marital-status   48842 non-null  object
+ 6   occupation       48842 non-null  object
+ 7   relationship     48842 non-null  object
+ 8   race             48842 non-null  object
+ 9   gender           48842 non-null  object
+ 10  capital-gain     48842 non-null  int64 
+ 11  capital-loss     48842 non-null  int64 
+ 12  hours-per-week   48842 non-null  int64 
+ 13  native-country   48842 non-null  object
+ 14  income           48842 non-null  object
+dtypes: int64(6), object(9)
+memory usage: 5.6+ MB
+None
+
+Missing Values Before Cleaning:
+age                0
+workclass          0
+fnlwgt             0
+education          0
+educational-num    0
+marital-status     0
+occupation         0
+relationship       0
+race               0
+gender             0
+capital-gain       0
+capital-loss       0
+hours-per-week     0
+native-country     0
+income             0
+dtype: int64
+
+Missing Values After Cleaning:
+age                0
+workclass          0
+fnlwgt             0
+education          0
+educational-num    0
+marital-status     0
+occupation         0
+relationship       0
+race               0
+gender             0
+capital-gain       0
+capital-loss       0
+hours-per-week     0
+native-country     0
+income             0
+dtype: int64
+
+Dataset After Cleaning:
+   age  workclass  fnlwgt     education  educational-num      marital-status  \
+0   25    Private  226802          11th                7       Never-married   
+1   38    Private   89814       HS-grad                9  Married-civ-spouse   
+2   28  Local-gov  336951    Assoc-acdm               12  Married-civ-spouse   
+3   44    Private  160323  Some-college               10  Married-civ-spouse   
+4   18    Private  103497  Some-college               10       Never-married   
+
+          occupation relationship   race  gender  capital-gain  capital-loss  \
+0  Machine-op-inspct    Own-child  Black    Male             0             0   
+1    Farming-fishing      Husband  White    Male             0             0   
+2    Protective-serv      Husband  White    Male             0             0   
+3  Machine-op-inspct      Husband  Black    Male          7688             0   
+4     Prof-specialty    Own-child  White  Female             0             0   
+
+   hours-per-week native-country income  
+0              40  United-States  <=50K  
+1              50  United-States  <=50K  
+2              40  United-States   >50K  
+3              40  United-States   >50K  
+4              30  United-States  <=50K  
+
+========== INTEGRATE STEP ==========
+Only one dataset is available.
+No integration is required.
+
+========== TRANSFORM STEP ==========
+
+Dataset After Transformation:
+        age  workclass    fnlwgt  education  educational-num  marital-status  \
+0 -0.995947          3  0.351584          1        -1.197970               4   
+1 -0.047620          3 -0.945452         11        -0.419766               2   
+2 -0.777103          1  1.394503          7         0.747540               2   
+3  0.390069          3 -0.277855         15        -0.030664               2   
+4 -1.506585          3 -0.815898         15        -0.030664               4   
+
+   occupation  relationship  race  gender  capital-gain  capital-loss  \
+0           6             3     2       1     -0.144882     -0.217248   
+1           4             0     4       1     -0.144882     -0.217248   
+2          10             0     4       1     -0.144882     -0.217248   
+3           6             0     2       1      0.886257     -0.217248   
+4           9             3     4       0     -0.144882     -0.217248   
+
+   hours-per-week  native-country  income  
+0       -0.034366              38       0  
+1        0.772567              38       0  
+2       -0.034366              38       1  
+3       -0.034366              38       1  
+4       -0.841299              38       0  
+
+========== REDUCE STEP ==========
+Original Shape : (48790, 15)
+Reduced Shape  : (48790, 15)
+
+Reduced Dataset Preview:
+         0    1         2     3         4    5     6    7    8    9   \
+0 -0.995947  3.0  0.351584   1.0 -1.197970  4.0   6.0  3.0  2.0  1.0   
+1 -0.047620  3.0 -0.945452  11.0 -0.419766  2.0   4.0  0.0  4.0  1.0   
+2 -0.777103  1.0  1.394503   7.0  0.747540  2.0  10.0  0.0  4.0  1.0   
+3  0.390069  3.0 -0.277855  15.0 -0.030664  2.0   6.0  0.0  2.0  1.0   
+4 -1.506585  3.0 -0.815898  15.0 -0.030664  4.0   9.0  3.0  4.0  0.0   
+
+         10        11        12    13   14  
+0 -0.144882 -0.217248 -0.034366  38.0  0.0  
+1 -0.144882 -0.217248  0.772567  38.0  0.0  
+2 -0.144882 -0.217248 -0.034366  38.0  1.0  
+3  0.886257 -0.217248 -0.034366  38.0  1.0  
+4 -0.144882 -0.217248 -0.841299  38.0  0.0  
+
+===================================
+CITR PREPROCESSING COMPLETED
+===================================
