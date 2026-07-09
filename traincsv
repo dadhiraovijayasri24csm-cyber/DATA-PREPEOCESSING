@@ -1,0 +1,197 @@
+# =====================================================
+# C I T R  PREPROCESSING ON TITANIC DATASET
+# =====================================================
+
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.feature_selection import VarianceThreshold
+
+# =====================================================
+# STEP 1 : LOAD DATASET
+# =====================================================
+
+df = pd.read_csv("train.csv")
+
+print("Original Dataset")
+print(df.head())
+
+# =====================================================
+# C - CLEAN
+# =====================================================
+
+print("\n========== CLEAN ==========")
+
+# Check missing values
+print("\nMissing Values Before Cleaning:")
+print(df.isnull().sum())
+
+# Remove duplicate rows
+df = df.drop_duplicates()
+
+# Numerical columns
+num_cols = df.select_dtypes(include=['int64', 'float64']).columns
+
+# Fill missing numerical values with median
+for col in num_cols:
+    df[col] = df[col].fillna(df[col].median())
+
+# Categorical columns
+cat_cols = df.select_dtypes(include=['object']).columns
+
+# Fill missing categorical values with mode
+for col in cat_cols:
+    df[col] = df[col].fillna(df[col].mode()[0])
+
+print("\nMissing Values After Cleaning:")
+print(df.isnull().sum())
+
+# =====================================================
+# I - INTEGRATE
+# =====================================================
+
+print("\n========== INTEGRATE ==========")
+
+# Since only one dataset is available,
+# integration is not required.
+
+print("Only one dataset is available.")
+print("No integration is required.")
+
+# =====================================================
+# T - TRANSFORM
+# =====================================================
+
+print("\n========== TRANSFORM ==========")
+
+# Encode categorical columns
+encoder = LabelEncoder()
+
+for col in cat_cols:
+    df[col] = encoder.fit_transform(df[col])
+
+# Scale numerical columns
+scaler = StandardScaler()
+
+df[num_cols] = scaler.fit_transform(df[num_cols])
+
+print("\nTransformed Dataset")
+print(df.head())
+
+# =====================================================
+# R - REDUCE
+# =====================================================
+
+print("\n========== REDUCE ==========")
+
+selector = VarianceThreshold(threshold=0.01)
+
+reduced_data = selector.fit_transform(df)
+
+print("Original Shape :", df.shape)
+print("Reduced Shape  :", reduced_data.shape)
+
+# Display reduced dataset
+reduced_df = pd.DataFrame(reduced_data)
+
+print("\nReduced Dataset")
+print(reduced_df.head())
+
+print("\n========== PREPROCESSING COMPLETED ==========")
+
+
+output:Original Dataset
+   PassengerId  Survived  Pclass  \
+0            1         0       3   
+1            2         1       1   
+2            3         1       3   
+3            4         1       1   
+4            5         0       3   
+
+                                                Name     Sex   Age  SibSp  \
+0                            Braund, Mr. Owen Harris    male  22.0      1   
+1  Cumings, Mrs. John Bradley (Florence Briggs Th...  female  38.0      1   
+2                             Heikkinen, Miss. Laina  female  26.0      0   
+3       Futrelle, Mrs. Jacques Heath (Lily May Peel)  female  35.0      1   
+4                           Allen, Mr. William Henry    male  35.0      0   
+
+   Parch            Ticket     Fare Cabin Embarked  
+0      0         A/5 21171   7.2500   NaN        S  
+1      0          PC 17599  71.2833   C85        C  
+2      0  STON/O2. 3101282   7.9250   NaN        S  
+3      0            113803  53.1000  C123        S  
+4      0            373450   8.0500   NaN        S  
+
+========== CLEAN ==========
+
+Missing Values Before Cleaning:
+PassengerId      0
+Survived         0
+Pclass           0
+Name             0
+Sex              0
+Age            177
+SibSp            0
+Parch            0
+Ticket           0
+Fare             0
+Cabin          687
+Embarked         2
+dtype: int64
+
+Missing Values After Cleaning:
+PassengerId    0
+Survived       0
+Pclass         0
+Name           0
+Sex            0
+Age            0
+SibSp          0
+Parch          0
+Ticket         0
+Fare           0
+Cabin          0
+Embarked       0
+dtype: int64
+
+========== INTEGRATE ==========
+Only one dataset is available.
+No integration is required.
+
+========== TRANSFORM ==========
+
+Transformed Dataset
+   PassengerId  Survived    Pclass  Name  Sex       Age     SibSp     Parch  \
+0    -1.730108 -0.789272  0.827377   108    1 -0.565736  0.432793 -0.473674   
+1    -1.726220  1.266990 -1.566107   190    0  0.663861  0.432793 -0.473674   
+2    -1.722332  1.266990  0.827377   353    0 -0.258337 -0.474545 -0.473674   
+3    -1.718444  1.266990 -1.566107   272    0  0.433312  0.432793 -0.473674   
+4    -1.714556 -0.789272  0.827377    15    1  0.433312 -0.474545 -0.473674   
+
+   Ticket      Fare  Cabin  Embarked  
+0     523 -0.502445     47         2  
+1     596  0.786845     81         0  
+2     669 -0.488854     47         2  
+3      49  0.420730     55         2  
+4     472 -0.486337     47         2  
+
+========== REDUCE ==========
+Original Shape : (891, 12)
+Reduced Shape  : (891, 12)
+
+Reduced Dataset
+         0         1         2      3    4         5         6         7   \
+0 -1.730108 -0.789272  0.827377  108.0  1.0 -0.565736  0.432793 -0.473674   
+1 -1.726220  1.266990 -1.566107  190.0  0.0  0.663861  0.432793 -0.473674   
+2 -1.722332  1.266990  0.827377  353.0  0.0 -0.258337 -0.474545 -0.473674   
+3 -1.718444  1.266990 -1.566107  272.0  0.0  0.433312  0.432793 -0.473674   
+4 -1.714556 -0.789272  0.827377   15.0  1.0  0.433312 -0.474545 -0.473674   
+
+      8         9     10   11  
+0  523.0 -0.502445  47.0  2.0  
+1  596.0  0.786845  81.0  0.0  
+2  669.0 -0.488854  47.0  2.0  
+3   49.0  0.420730  55.0  2.0  
+4  472.0 -0.486337  47.0  2.0  
+
+========== PREPROCESSING COMPLETED ==========
